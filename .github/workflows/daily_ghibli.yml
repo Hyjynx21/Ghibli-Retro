@@ -1,8 +1,8 @@
 name: Daily Ghibli Refresh
 on:
   schedule:
-    - cron: '0 15 * * *' # This runs at 8:00 AM Pacific Time daily
-  workflow_dispatch:      # This adds a button to run it manually
+    - cron: '0 15 * * *' 
+  workflow_dispatch:      
 
 jobs:
   refresh:
@@ -13,12 +13,11 @@ jobs:
 
       - name: Pick and Push Image
         run: |
-          # Pick a random .jpg file from the main folder
           IMAGE=$(ls *.jpg | shuf -n 1)
           echo "Sending $IMAGE to TRMNL..."
           
-          # Push to your TRMNL Webhook
+          # This version sends the image correctly to a Custom Plugin Webhook
           curl -X POST \
                -H "Content-Type: image/jpeg" \
                --data-binary @"$IMAGE" \
-               "${{ secrets.TRMNL_WEBHOOK }}"
+               "https://usetrmnl.com/api/custom_plugins/bf578f92-2df0-4fad-aece-f67a2b82aef"
