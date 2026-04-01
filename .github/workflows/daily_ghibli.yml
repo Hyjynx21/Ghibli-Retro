@@ -14,10 +14,13 @@ jobs:
       - name: Pick and Push Image
         run: |
           IMAGE=$(ls *.jpg | shuf -n 1)
-          echo "Sending $IMAGE to TRMNL..."
+          echo "Encoding $IMAGE..."
           
-          # This version sends the image correctly to a Custom Plugin Webhook
+          # Convert image to Base64
+          B64_DATA=$(base64 -w 0 "$IMAGE")
+          
+          # Send to TRMNL as a variable named 'ghibli_image'
           curl -X POST \
-               -H "Content-Type: image/jpeg" \
-               --data-binary @"$IMAGE" \
+               -H "Content-Type: application/json" \
+               -d "{\"merge_variables\": {\"ghibli_image\": \"data:image/jpeg;base64,$B64_DATA\"}}" \
                "https://usetrmnl.com/api/custom_plugins/bf578f92-2df0-4fad-aece-f67a2b82aef"
