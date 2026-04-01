@@ -13,6 +13,15 @@ jobs:
 
       - name: Push to TRMNL
         run: |
+          # 1. Pick a random JPG
           IMAGE=$(ls *.jpg | shuf -n 1)
-          B64=$(base64 -w 0 $IMAGE)
-          curl -X POST "https://usetrmnl.com/api/custom_plugins/bf578f92-2df0-4fad-aece-f67a2b82aef" -H "Content-Type: application/json" -d "{\"merge_variables\":{\"ghibli_image\":\"data:image/jpeg;base64,$B64\"}}"
+          echo "Selected: $IMAGE"
+          
+          # 2. Convert to Base64 and wrap it in the JSON TRMNL needs
+          B64_DATA=$(base64 -w 0 "$IMAGE")
+          echo "{\"merge_variables\": {\"ghibli_image\": \"data:image/jpeg;base64,$B64_DATA\"}}" > payload.json
+          
+          # 3. Send the FILE to TRMNL (this avoids the 'Argument list too long' error)
+          curl -X POST "https://usetrmnl.com/api/custom_plugins/bf578f92-2df0-4fad-aece-f67a2b82aef" \
+               -H "Content-Type: application/json" \
+               -d @payload.json
