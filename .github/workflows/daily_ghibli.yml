@@ -1,22 +1,31 @@
 name: Daily Ghibli Refresh
 on:
   schedule:
-    - cron: '0 15 * * *' 
-  workflow_dispatch:      
+    - cron: '0 15 * * *' # Runs every day at 3PM UTC
+  workflow_dispatch:      # Allows you to click "Run" manually
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write    # Crucial: allows the action to save the file back to your repo
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Push to TRMNL
+      - name: Pick and Overwrite
         run: |
-          IMAGE=$(ls *.jpg | shuf -n 1)
-          echo "Sending $IMAGE to TRMNL..."
+          # 1. Pick a random jpg (excluding current.jpg itself)
+          # Make sure your filenames have no spaces!
+          SELECTED=$(ls *.jpg | grep -v "current.jpg" | shuf -n 1)
+          echo "Selected image: $SELECTED"
           
-          # Use the NEW URL you just copied from the Webhook Image plugin
-          curl -X POST "https://trmnl.com/api/plugin_settings/266c686a-405a-4824-8a82-5ba37e5aa5a6/image" \
-               -H "Content-Type: image/jpeg" \
-               --data-binary @"$IMAGE"
+          # 2. Copy the selected image to 'current.jpg'
+          cp "$SELECTED" current.jpg
+
+          # 3. Push the change back to GitHub
+          git config --global user.name "GhibliBot"
+          git config --global user.email "bot@ghibli.com"
+          git add current.jpg
+          git commit -m "Daily refresh: $SELECTED"
+          git push
