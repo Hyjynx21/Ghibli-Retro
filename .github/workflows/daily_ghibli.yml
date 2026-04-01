@@ -16,7 +16,7 @@ jobs:
           IMAGE=$(ls *.jpg | shuf -n 1)
           echo "Sending $IMAGE to TRMNL..."
           
-          # We use the /api/custom_image/ endpoint for direct image pushes
-          curl -X POST "https://usetrmnl.com/api/custom_image/bf578f92-2df0-4fad-aece-f67a2b82aef" \
-           -H "Content-Type: image/jpeg" \
-           --data-binary @"$IMAGE"
+          # Use the NEW URL you just copied from the Webhook Image plugin
+          curl -X POST "https://trmnl.com/api/plugin_settings/266c686a-405a-4824-8a82-5ba37e5aa5a6/image" \
+               -H "Content-Type: image/jpeg" \
+               --data-binary @"$IMAGE"
