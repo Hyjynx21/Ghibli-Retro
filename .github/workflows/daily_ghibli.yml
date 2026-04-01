@@ -1,0 +1,24 @@
+name: Daily Ghibli Refresh
+on:
+  schedule:
+    - cron: '0 15 * * *' # This runs at 8:00 AM Pacific Time daily
+  workflow_dispatch:      # This adds a button to run it manually
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Pick and Push Image
+        run: |
+          # Pick a random .jpg file from the main folder
+          IMAGE=$(ls *.jpg | shuf -n 1)
+          echo "Sending $IMAGE to TRMNL..."
+          
+          # Push to your TRMNL Webhook
+          curl -X POST \
+               -H "Content-Type: image/jpeg" \
+               --data-binary @"$IMAGE" \
+               "${{ secrets.TRMNL_WEBHOOK }}"
