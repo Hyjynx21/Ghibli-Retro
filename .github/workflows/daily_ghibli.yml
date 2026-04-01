@@ -11,17 +11,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Pick and Push Image
-        shell: bash
+      - name: Push to TRMNL
         run: |
-          # 1. Pick a random JPG
           IMAGE=$(ls *.jpg | shuf -n 1)
-          echo "Selected image: $IMAGE"
-          
-          # 2. Encode to Base64
-          B64_DATA=$(base64 -w 0 "$IMAGE")
-          
-          # 3. Send to TRMNL using a flat JSON string
-          curl -X POST "https://usetrmnl.com/api/custom_plugins/bf578f92-2df0-4fad-aece-f67a2b82aef" \
-               -H "Content-Type: application/json" \
-               -d "{\"merge_variables\":{\"ghibli_image\":\"data:image/jpeg;base64,$B64_DATA\"}}"
+          B64=$(base64 -w 0 $IMAGE)
+          curl -X POST "https://usetrmnl.com/api/custom_plugins/bf578f92-2df0-4fad-aece-f67a2b82aef" -H "Content-Type: application/json" -d "{\"merge_variables\":{\"ghibli_image\":\"data:image/jpeg;base64,$B64\"}}"
