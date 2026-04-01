@@ -13,14 +13,18 @@ jobs:
 
       - name: Pick and Push Image
         run: |
+          # Find a random jpg
           IMAGE=$(ls *.jpg | shuf -n 1)
           echo "Encoding $IMAGE..."
           
-          # Convert image to Base64
+          # Convert to base64 string
           B64_DATA=$(base64 -w 0 "$IMAGE")
           
-          # Send to TRMNL as a variable named 'ghibli_image'
+          # Construct the JSON manually to avoid quote escape issues
+          JSON_DATA="{\"merge_variables\": {\"ghibli_image\": \"data:image/jpeg;base64,$B64_DATA\"}}"
+          
+          # Send to TRMNL
           curl -X POST \
                -H "Content-Type: application/json" \
-               -d "{\"merge_variables\": {\"ghibli_image\": \"data:image/jpeg;base64,$B64_DATA\"}}" \
+               -d "$JSON_DATA" \
                "https://usetrmnl.com/api/custom_plugins/bf578f92-2df0-4fad-aece-f67a2b82aef"
